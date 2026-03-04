@@ -1,8 +1,16 @@
 import java.util.Scanner;
-import java.util.Deque;
-import java.util.LinkedList;
 
 public class Palindrome {
+
+    static class Node {
+        char data;
+        Node next;
+
+        Node(char data) {
+            this.data = data;
+            this.next = null;
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -12,19 +20,56 @@ public class Palindrome {
         System.out.print("Enter a string: ");
         String input = scanner.nextLine();
 
-        Deque<Character> deque = new LinkedList<>();
+        Node head = null;
+        Node tail = null;
 
         for (int i = 0; i < input.length(); i++) {
-            deque.addLast(input.charAt(i));
+            Node newNode = new Node(input.charAt(i));
+            if (head == null) {
+                head = newNode;
+                tail = newNode;
+            } else {
+                tail.next = newNode;
+                tail = newNode;
+            }
         }
+
+        if (head == null || head.next == null) {
+            System.out.println("It is a Palindrome.");
+            scanner.close();
+            return;
+        }
+
+        Node slow = head;
+        Node fast = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        Node prev = null;
+        Node current = slow;
+
+        while (current != null) {
+            Node nextNode = current.next;
+            current.next = prev;
+            prev = current;
+            current = nextNode;
+        }
+
+        Node firstHalf = head;
+        Node secondHalf = prev;
 
         boolean isPalindrome = true;
 
-        while (deque.size() > 1) {
-            if (!deque.removeFirst().equals(deque.removeLast())) {
+        while (secondHalf != null) {
+            if (firstHalf.data != secondHalf.data) {
                 isPalindrome = false;
                 break;
             }
+            firstHalf = firstHalf.next;
+            secondHalf = secondHalf.next;
         }
 
         if (isPalindrome) {
